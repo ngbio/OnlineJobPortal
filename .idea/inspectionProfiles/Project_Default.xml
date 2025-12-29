@@ -1,0 +1,20 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="false" level="INFORMATION" enabled_by_default="false">
+      <option name="ignoredPackages">
+        <list>
+          <option value="Flask" />
+          <option value="flask-cors" />
+          <option value="psycopg2-binary" />
+          <option value="minio" />
+          <option value="pyjwt" />
+          <option value="stripe" />
+          <option value="python-dotenv" />
+          <option value="werkzeug" />
+          <option value="gunicorn" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
