@@ -17,7 +17,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 MEDIA_ROOT = '%s/jobapps/static/' % BASE_DIR
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
@@ -28,7 +27,6 @@ SECRET_KEY = 'django-insecure-#q_5=2g2%$&702hvr4e(6%4ywuzgyax7pf$#o4vrgx7ymi3u#m
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -43,15 +41,23 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg',
+    'oauth2_provider',
 ]
+
+EST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    )
+}
 
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
+
 cloudinary.config(
-  	cloud_name = "dprwsgoeg",
-  	api_key = "561165731845827",
-  	api_secret = "dUWu7WiILETcjr_Sn8sicQhhiW0"
+    cloud_name="dprwsgoeg",
+    api_key="561165731845827",
+    api_secret="dUWu7WiILETcjr_Sn8sicQhhiW0"
 )
 
 MIDDLEWARE = [
@@ -83,7 +89,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'jobportal.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
@@ -98,6 +103,7 @@ DATABASES = {
 }
 
 import pymysql
+
 pymysql.install_as_MySQLdb()
 AUTH_USER_MODEL = 'jobapps.User'
 
@@ -119,7 +125,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
@@ -131,8 +136,10 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+CLIENT_ID = 'wCjSwpE1U1ZctNot6Uoa5G5K62x3vwrgThbkvMLw'
+CLIENT_SECRET = 'WL8blqg2BeV1H0CK8U284hub9uXM2nesPAto8ju3DfyJ177HERhG4UVvN2Tr4FTv5pdNEzfz3gOWT904H4C72zXa4F9HOxrGi2CwjOAVeMwLM5uaKdz45IBgBgjncE5G'

@@ -7,28 +7,12 @@ class User(AbstractUser):
         ('admin', 'Admin'),
         ('employer', 'Employer'),
         ('candidate', 'Candidate')], max_length=50, default='candidate')
-    avatar = models.ImageField(upload_to='avatars/', null=True)
+
+    avatar = CloudinaryField(null=True)
 
     def __str__(self):
         return self.username
 
-class Employer(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=50)
-    company = models.CharField(max_length=50)
-    address = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
-
-class Candidate(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=50)
-    phone = models.CharField(max_length=15)
-    address = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
 
 class BaseModel(models.Model):
     active = models.BooleanField(default=True)
@@ -39,8 +23,9 @@ class BaseModel(models.Model):
         abstract = True
 
 class JobPost(BaseModel):
-    employer = models.ForeignKey(Employer, on_delete=models.CASCADE, related_name='job_posts')
+    employer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='job_posts', limit_choices_to={'role':'employer'})
     name = models.CharField(max_length=200)
+    company = models.CharField(max_length=200)
     description = models.TextField(null=True)
     request = models.TextField(null=True)
     salary = models.IntegerField(null=True)
@@ -52,8 +37,8 @@ class JobPost(BaseModel):
 
 
 class Applications(BaseModel):
-    job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE)
-    candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
+    job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE, null=True)
+    candidate = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role':'candidate'})
     notes = models.TextField(null=True)
     applied = models.TextField(null=True)
     cv = CloudinaryField()
