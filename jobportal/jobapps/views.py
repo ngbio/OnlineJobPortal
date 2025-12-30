@@ -5,11 +5,18 @@ from rest_framework.response import Response
 from jobapps import serializers, paginators
 from jobapps.models import JobPost, Applications, User
 
+class IsApprovedEmployer(permissions.BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        return (
+            user.is_authenticated and user.role == 'employer' and user.is_active
+        )
+
 class JobPostViewSet(viewsets.ViewSet, generics.ListAPIView):
     queryset = JobPost.objects.filter(active=True)
     serializer_class = serializers.JobPostSerializer
     pagination_class = paginators.ItemPaginator #Phân trang
-
+    permission_classes = [IsApprovedEmployer]
     def get_queryset(self):
         query = self.queryset
 
