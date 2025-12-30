@@ -4,7 +4,6 @@ from cloudinary.models import CloudinaryField
 
 class User(AbstractUser):
     role = models.CharField(choices=[
-        ('admin', 'Admin'),
         ('employer', 'Employer'),
         ('candidate', 'Candidate')], max_length=50, default='candidate')
 
@@ -37,7 +36,7 @@ class JobPost(BaseModel):
 
 
 class Applications(BaseModel):
-    job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE, null=True)
+    job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE)
     candidate = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role':'candidate'})
     notes = models.TextField(null=True)
     applied = models.TextField(null=True)

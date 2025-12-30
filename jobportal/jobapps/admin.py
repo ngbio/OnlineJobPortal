@@ -1,7 +1,7 @@
 from django.contrib import admin
-from django.db.models import Count
 from django.utils.safestring import mark_safe
-from jobapps.models import JobPost, Applications
+from jobapps.models import JobPost, Applications, User
+
 
 class ApplicationsAdmin(admin.ModelAdmin):
     list_display = ['id', 'created_date', 'active']
@@ -14,8 +14,10 @@ class ApplicationsAdmin(admin.ModelAdmin):
 class MyAdminSite(admin.AdminSite):
     site_header = 'Job Post'
 
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('id', 'username', 'email', 'role', 'is_active')
 
 admin_site = MyAdminSite(name='Job Post')
-
+admin_site.register(User)
 admin_site.register(JobPost)
 admin_site.register(Applications, ApplicationsAdmin)
