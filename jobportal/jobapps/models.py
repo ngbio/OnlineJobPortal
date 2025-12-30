@@ -40,7 +40,7 @@ class Applications(BaseModel):
     candidate = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role':'candidate'})
     notes = models.TextField(null=True)
     applied = models.TextField(null=True)
-    cv = CloudinaryField()
+    cv = CloudinaryField(null=True)
 
     def __str__(self):
         return self.notes
