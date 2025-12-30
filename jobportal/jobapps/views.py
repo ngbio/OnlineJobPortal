@@ -16,7 +16,7 @@ class JobPostViewSet(viewsets.ViewSet, generics.ListAPIView):
     queryset = JobPost.objects.filter(active=True)
     serializer_class = serializers.JobPostSerializer
     pagination_class = paginators.ItemPaginator #Phân trang
-    permission_classes = [IsApprovedEmployer]
+
     def get_queryset(self):
         query = self.queryset
 
@@ -29,6 +29,20 @@ class JobPostViewSet(viewsets.ViewSet, generics.ListAPIView):
             query = query.filter(employer_id=employer_id)
 
         return query
+
+    @action(methods=['post'], url_path='create',detail=False, permission_classes=[IsApprovedEmployer])
+    def create_job_post(self, request):
+            s = serializers.JobPostSerializer(data={
+                'name': request.data.get('name'),
+                'company' : request.data.get('company'),
+                'description': request.data.get('description'),
+                'request': request.data.get('request'),
+                'salary': request.data.get('salary'),
+                'employer': request.user.pk  # gán employer từ user đang login
+            })
+            s.is_valid(raise_exception=True)
+            c = s.save()
+            return Response(serializers.JobPostSerializer(c).data, status=status.HTTP_201_CREATED)
 
 class ApplicationViewSet(viewsets.ViewSet, generics.ListAPIView):
     queryset = Applications.objects.filter(active=True)
