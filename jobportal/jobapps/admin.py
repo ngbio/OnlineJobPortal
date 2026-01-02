@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from jobapps.models import JobPost, Applications, User
+from jobapps.models import JobPost, Applications, User, Comment
 
 
 class ApplicationsAdmin(admin.ModelAdmin):
@@ -21,3 +21,4 @@ admin_site = MyAdminSite(name='Job Post')
 admin_site.register(User)
 admin_site.register(JobPost)
 admin_site.register(Applications, ApplicationsAdmin)
+admin_site.register(Comment)

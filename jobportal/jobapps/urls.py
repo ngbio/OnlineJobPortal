@@ -3,9 +3,9 @@ from jobapps import views
 from rest_framework.routers import DefaultRouter
 
 r = DefaultRouter()
-r.register('job_post', views.JobPostViewSet, basename='job_post')
-r.register('applications', views.ApplicationViewSet, basename='application')
-r.register('users', views.UserViewSet, basename='user')
+r.register('job_post', views.JobPostView, basename='job_post')
+r.register('applications', views.ApplicationView, basename='application')
+r.register('users', views.UserView, basename='user')
 
 
 

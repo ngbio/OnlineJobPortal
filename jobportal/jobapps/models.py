@@ -5,7 +5,7 @@ from cloudinary.models import CloudinaryField
 class User(AbstractUser):
     role = models.CharField(choices=[
         ('employer', 'Employer'),
-        ('candidate', 'Candidate')], max_length=50, default='candidate')
+        ('candidate', 'Candidate')], max_length=50)
 
     avatar = CloudinaryField(null=True)
 
@@ -22,7 +22,7 @@ class BaseModel(models.Model):
         abstract = True
 
 class JobPost(BaseModel):
-    employer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='job_posts', limit_choices_to={'role':'employer'})
+    employer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='job_posts', limit_choices_to={'role':'employer', 'is_active': True})
     name = models.CharField(max_length=200)
     company = models.CharField(max_length=200)
     description = models.TextField(null=True)
@@ -36,15 +36,32 @@ class JobPost(BaseModel):
 
 
 class Applications(BaseModel):
-    job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE)
+    job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name='applications')
     candidate = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role':'candidate'})
-    notes = models.TextField(null=True)
-    applied = models.TextField(null=True)
+    full_name = models.CharField(max_length=200)
+    email = models.EmailField(max_length=200)
+    phone = models.CharField(max_length=200)
     cv = CloudinaryField(null=True)
 
-    def __str__(self):
-        return self.notes
+    class Meta:
+        unique_together = ('job_post', 'candidate')
 
+    def __str__(self):
+        return self.full_name
+
+class Interaction(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False,  limit_choices_to={'role':'employer', 'is_active': True})
+    application = models.ForeignKey(Applications, on_delete=models.CASCADE, null=False)
+
+    class Meta:
+        abstract = True
+
+
+class Comment(Interaction):
+    content = models.TextField(null=False, blank=False)
+
+    def __str__(self):
+        return self.content
 
 class Payment(BaseModel):
     pass
