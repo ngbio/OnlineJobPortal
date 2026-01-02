@@ -1,18 +1,18 @@
-from jobapps.models import JobPost, Applications, User
+from jobapps.models import JobPost, Applications, User, Comment
 from rest_framework import serializers
 
 class JobPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobPost
-        fields = ['id','name', 'company', 'description', 'request', 'salary']
+        fields = ['id','name', 'company', 'description', 'request', 'salary', 'address', 'benefits']
 
 class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Applications
-        fields = ['id','notes', 'created_date', 'cv']
+        fields = ['id','full_name', 'email', 'phone', 'created_date', 'cv']
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['cv'] = instance.cv.url
+        data['cv'] = instance.cv.url if instance.cv else ''
         return data
 
 class UserSerializer(serializers.ModelSerializer):
@@ -28,15 +28,46 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         u = User(**validated_data)
         u.set_password(u.password)
+        if u.role == 'candidate':
+            u.is_active = True
         if u.role == 'employer':
-            u.is_active = False  # chờ duyệt
-        u.save()
+            u.is_active = False # chờ duyệt
 
+
+        u.save()
         return u
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
 
-        data['avatar'] = instance.avatar.url if instance.avatar else None
+        data['avatar'] = instance.avatar.url if instance.avatar else ''
 
         return data
+
+class CommentSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        data['user'] = UserSerializer(instance.user).data
+
+        return data
+
+    # def validate(self, attrs):
+    #     user = attrs.get('user')
+    #     application = attrs.get('application')
+    #
+    #     # employer chỉ được comment application thuộc job của mình
+    #     if application.job_post.employer != user:
+    #         raise serializers.ValidationError(
+    #             "Bạn không có quyền đánh giá application này."
+    #         )
+
+        return attrs
+    class Meta:
+        model = Comment
+        fields = ['id', 'content', 'created_date', 'user', 'application']
+        extra_kwargs = {
+            'application': {
+                'write_only': "True"
+            }
+        }
