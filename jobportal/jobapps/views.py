@@ -58,7 +58,7 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
         if job.employer != request.user:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        applications = job.applications_set.filter(active=True)
+        applications = job.applications.filter(active=True)
 
         return Response(serializers.ApplicationSerializer(applications, many=True).data, status=status.HTTP_200_OK)
 
@@ -74,7 +74,7 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
             if k in ['name', 'company', 'description', 'request', 'salary']:
                 setattr(job, k, v)
         job.save()
-        return Response(serializers.UserSerializer(job).data, status=status.HTTP_200_OK)
+        return Response(serializers.JobPostSerializer(job).data, status=status.HTTP_200_OK)
 
 
 class ApplicationView(viewsets.ViewSet, generics.ListAPIView):
@@ -104,7 +104,7 @@ class ApplicationView(viewsets.ViewSet, generics.ListAPIView):
         application = self.get_object()
         user = request.user
 
-        if application.candidate != user or application.job_post.employer != user:
+        if application.candidate != user and application.job_post.employer != user:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         if request.method.__eq__('POST'):

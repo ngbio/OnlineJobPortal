@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'ckeditor_uploader'
 ]
 
-EST_FRAMEWORK = {
+REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     )
