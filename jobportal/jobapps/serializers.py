@@ -61,8 +61,8 @@ class CommentSerializer(serializers.ModelSerializer):
     #         raise serializers.ValidationError(
     #             "Bạn không có quyền đánh giá application này."
     #         )
+        # return attrs
 
-        return attrs
     class Meta:
         model = Comment
         fields = ['id', 'content', 'created_date', 'user', 'application']
