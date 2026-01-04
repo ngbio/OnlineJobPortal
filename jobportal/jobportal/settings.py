@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'oauth2_provider',
     'cloudinary',
+    'ckeditor',
+    'ckeditor_uploader'
 ]
 
 EST_FRAMEWORK = {
@@ -70,6 +72,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CKEDITOR_UPLOAD_PATH = "images/ckeditors/"
 
 ROOT_URLCONF = 'jobportal.urls'
 
@@ -142,5 +146,5 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-CLIENT_ID = 'wCjSwpE1U1ZctNot6Uoa5G5K62x3vwrgThbkvMLw'
-CLIENT_SECRET = 'WL8blqg2BeV1H0CK8U284hub9uXM2nesPAto8ju3DfyJ177HERhG4UVvN2Tr4FTv5pdNEzfz3gOWT904H4C72zXa4F9HOxrGi2CwjOAVeMwLM5uaKdz45IBgBgjncE5G'
+CLIENT_ID = '2mRyMZoWABiiF9BFUnlFGlWMnlwDaPGP0vj0oDvV'
+CLIENT_SECRET = 'vmT7fAz1HYgTDtbUjTl3gVyOGnH05ZVTS7y61g1tatDlxbFi3aO9NJPd9EgiFvoUbA65OVBdYNdypkHcX2O0bcatmzPS0cFNbllxXhXMWDrmX5Z8EW6zydqIRwUH4Hlr'
