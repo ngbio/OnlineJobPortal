@@ -9,20 +9,27 @@ class JobPostSerializer(serializers.ModelSerializer):
 class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Applications
-        fields = ['id','full_name', 'email', 'phone', 'created_date', 'cv']
+        fields = [
+            'id', 'full_name', 'email', 'phone',
+            'created_date', 'cv', 'candidate', 'job_post'
+        ]
+        extra_kwargs = {
+            'candidate': {'write_only': True},
+            'job_post': {'write_only': True},
+        }
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data['cv'] = instance.cv.url if instance.cv else ''
         return data
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username','password', 'email', 'first_name', 'last_name', 'avatar', 'role']
         extra_kwargs = {
-            'password': {
-                'write_only': True,
-            }
+            'password': {'write_only': True,}
         }
 
     def create(self, validated_data):

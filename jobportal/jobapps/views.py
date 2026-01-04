@@ -36,23 +36,23 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
 
         return query
 
-    @action(methods=['post'], url_path='create_job',detail=False, permission_classes=[IsApprovedEmployer])
-    def create_job_post(self, request):
-            s = serializers.JobPostSerializer(data={
-                'name': request.data.get('name'),
-                'company' : request.data.get('company'),
-                'description': request.data.get('description'),
-                'request': request.data.get('request'),
-                'salary': request.data.get('salary'),
-                'employer': request.user.pk  # gán employer từ user đang login
-            })
-            s.is_valid(raise_exception=True)
-            c = s.save()
-            return Response(serializers.JobPostSerializer(c).data, status=status.HTTP_201_CREATED)
+    @action(methods=['post'], detail=True, permission_classes=[permissions.IsAuthenticated])
+    def apply(self, request, pk):
+        if request.user.role != 'candidate':
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        s = serializers.ApplicationSerializer(data={
+            **request.data,
+            'candidate': request.user.pk,
+            'job_post': pk
+        })
+        s.is_valid(raise_exception=True)
+        app = s.save()
+        return Response(serializers.ApplicationSerializer(app).data, status=201)
 
     @action(methods=['get'], detail=True, permission_classes=[IsApprovedEmployer])
-    def applications(self, request):
-        job = self.get_object()
+    def applications(self, request, pk=None):
+        job = JobPost.objects.get(pk=pk, active=True)
 
         # CHỈ employer sở hữu job mới xem được
         if job.employer != request.user:
@@ -63,15 +63,15 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
         return Response(serializers.ApplicationSerializer(applications, many=True).data, status=status.HTTP_200_OK)
 
     @action(methods=['patch'], url_path='update_job', detail=True, permission_classes=[IsApprovedEmployer])
-    def get_job_post(self, request, pk):
-        job = self.get_object()
+    def update_job(self, request, pk=None):
+        job = JobPost.objects.get(pk=pk, active=True)
 
         if job.employer != request.user:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
 
         for k, v in request.data.items():
-            if k in ['name', 'company', 'description', 'request', 'salary']:
+            if k in ['name', 'company', 'description', 'request', 'salary', 'address', 'benefits']:
                 setattr(job, k, v)
         job.save()
         return Response(serializers.JobPostSerializer(job).data, status=status.HTTP_200_OK)
@@ -80,6 +80,7 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
 class ApplicationView(viewsets.ViewSet, generics.ListAPIView):
     queryset = Applications.objects.filter(active=True)
     serializer_class = serializers.ApplicationSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     @action(methods=['post'], url_path='create_application',detail=True, permission_classes=[permissions.IsAuthenticated])
     def create_application(self, request, pk):
@@ -101,7 +102,7 @@ class ApplicationView(viewsets.ViewSet, generics.ListAPIView):
 
     @action(methods=['get', 'post'], url_path='comments', detail=True, permission_classes=[IsApprovedEmployer])
     def get_comments(self, request, pk):
-        application = self.get_object()
+        application = Applications.objects.filter(pk=pk, active=True)
         user = request.user
 
         if application.candidate != user and application.job_post.employer != user:
