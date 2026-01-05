@@ -1,10 +1,17 @@
-from jobapps.models import JobPost, Applications, User, Comment
+from jobapps.models import JobPost, Applications, User, Comment, Category
 from rest_framework import serializers
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+
 
 class JobPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobPost
-        fields = ['id','name', 'company', 'description', 'request', 'salary', 'address', 'benefits']
+        fields = ['id', 'name', 'company', 'address', 'employer', 'created_date', 'category']
 
 class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,17 +65,6 @@ class CommentSerializer(serializers.ModelSerializer):
         data['user'] = UserSerializer(instance.user).data
 
         return data
-
-    # def validate(self, attrs):
-    #     user = attrs.get('user')
-    #     application = attrs.get('application')
-    #
-    #     # employer chỉ được comment application thuộc job của mình
-    #     if application.job_post.employer != user:
-    #         raise serializers.ValidationError(
-    #             "Bạn không có quyền đánh giá application này."
-    #         )
-        # return attrs
 
     class Meta:
         model = Comment
