@@ -11,7 +11,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class JobPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobPost
-        fields = ['id', 'name', 'company', 'address', 'employer', 'created_date', 'category']
+        fields = ['id', 'name', 'company', 'description', 'request', 'salary', 'address', 'benefits', 'category', 'employer']
 
 class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -59,6 +59,8 @@ class UserSerializer(serializers.ModelSerializer):
         return data
 
 class CommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
 
