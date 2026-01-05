@@ -3,14 +3,13 @@ from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from jobapps import serializers, paginators
-from jobapps.models import JobPost, Applications, User, Comment, Category
-from django.db.models import Count, Sum
+from jobapps.models import JobPost, Applications, User, Category
+from django.db.models import Count
 
 
 class CategoryView(viewsets.ViewSet, generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = serializers.CategorySerializer
-    permission_classes = [permissions.IsAuthenticated]
 
 class IsApprovedEmployer(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -53,8 +52,9 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
                             status=status.HTTP_403_FORBIDDEN)
 
         for k, v in request.data.items():
-            if k in ['name', 'company', 'address']:
-                setattr(job, k,v)
+            if k in ['name', 'company', 'salary', 'address', 'description', 'request', 'benefits', 'category_id']:
+                setattr(job, k, v)
+
         job.save()
         return Response(serializers.JobPostSerializer(job).data, status=status.HTTP_200_OK)
 
@@ -144,9 +144,12 @@ class ApplicationView(viewsets.ViewSet, generics.ListAPIView):
 
     @action(methods=['get', 'post'], url_path='comments', detail=True)
     def get_comments(self, request, pk = None):
-        job = get_object_or_404(JobPost, pk=pk)
+        application = self.get_object()
 
-        if job.employer != request.user:
+        is_employer = (application.job_post.employer == request.user)
+        is_candidate = (application.candidate == request.user)
+
+        if not (is_employer or is_candidate):
             return Response({"detail": "Bạn không có quyền của bài đăng này!"},
                             status=status.HTTP_403_FORBIDDEN)
 
@@ -164,7 +167,7 @@ class ApplicationView(viewsets.ViewSet, generics.ListAPIView):
 
             return Response(s.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        comments = self.get_object().comment_set.select_related('user').filter(active=True).filter(active=True)
+        comments = application.comment_set.select_related('user').filter(active=True).filter(active=True)
 
         # Phân trang
         p = paginators.CommentPaginator()
