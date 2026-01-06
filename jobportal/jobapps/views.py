@@ -69,8 +69,7 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
                             status=status.HTTP_403_FORBIDDEN)
 
         job.delete()
-        return Response({"detail": "Đã xóa bài đăng thành công!"}, status=status.HTTP_204_NO_CONTENT)
-
+        return Response({"message": "Xóa thành công"}, status=status.HTTP_200_OK)
 
     def get_queryset(self):
         query = self.queryset
@@ -107,7 +106,6 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
         if Applications.objects.filter(job_post_id=pk, candidate=request.user).exists():
             return Response( status=status.HTTP_400_BAD_REQUEST)
 
-
         data = request.data.copy()
         data['candidate'] = request.user.pk
         data['job_post'] = pk
@@ -135,6 +133,18 @@ class ApplicationView(viewsets.ViewSet, generics.ListAPIView):
     serializer_class = serializers.ApplicationSerializer
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [parsers.MultiPartParser, parsers.JSONParser]
+
+    def get_queryset(self):
+        query = self.queryset
+        user = self.request.user
+
+        if user.role == 'candidate':
+            query = query.filter(candidate=user)
+
+        elif user.role == 'employer':
+            query = query.filter(job_post__employer=user)
+
+        return query
 
     def get_permissions(self):
         if self.action.__eq__('get_comments') and self.request.method.__eq__('POST'):
