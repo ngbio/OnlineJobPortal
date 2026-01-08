@@ -15,7 +15,7 @@ const Stats = () => {
             const res = await authApis(user.access_token).get(endpoints['stats']);
             setStats(res.data);
         } catch (ex) {
-            console.error("Lỗi load thống kê:", ex);
+            console.error("Lỗi tải thống kê:", ex);
         } finally {
             setLoading(false);
         }
@@ -25,9 +25,9 @@ const Stats = () => {
         loadStats();
     }, []);
 
-    if (loading) return <ActivityIndicator style={{ flex: 1 }} size="large" color="#6200ee" />;
+    if (loading)   
+        return <ActivityIndicator style={{ flex: 1 }} size="large" color="#6200ee" />;
 
-    // Tìm số lượng đơn lớn nhất để tính toán tỷ lệ phần trăm cho thanh progress
     const maxApplications = stats.length > 0 ? Math.max(...stats.map(s => s.total_applications)) : 1;
 
     return (
@@ -44,7 +44,6 @@ const Stats = () => {
                             <Divider style={{ marginVertical: 10 }} />
                             
                             {stats.map((s) => {
-                                // Tính tỷ lệ phần trăm so với mục tiêu hoặc so với bài cao nhất
                                 const progress = s.total_applications / (maxApplications || 1);
                                 
                                 return (
