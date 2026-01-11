@@ -2,50 +2,80 @@
 
 {% block content %}
 
-<h1>THONG KE SO KHOA HOC THEO DANH MUC</h1>
+<h1>BÁO CÁO TỔNG QUAN</h1>
 
+<hr>
+
+<h3>1. Số lượng tin tuyển dụng theo danh mục</h3>
 <ul>
-    {% for s in stats %}
+    {% for s in stats_category %}
     <li><strong>{{ s.name }}</strong>: {{ s.count }}</li>
     {% endfor %}
 </ul>
+<div style="width: 70%; margin-bottom: 50px;">
+  <canvas id="categoryChart"></canvas>
+</div>
 
-<div style="width: 60%">
-  <canvas id="myChart"></canvas>
+<hr>
+
+<h3>2. Số lượng ứng viên theo tin tuyển dụng</h3>
+<ul>
+    {% for s in stats_application %}
+    <li><strong>{{ s.name }}</strong>: {{ s.count }}</li>
+    {% endfor %}
+</ul>
+<div style="width: 70%;">
+  <canvas id="applicationChart"></canvas>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    data = [];
-    labels = [];
-
-    {% for s in stats %}
-    data.push({{ s.count }})
-    labels.push('{{ s.name }}')
-    {% endfor %}
-
     window.onload = function() {
-        const ctx = document.getElementById('myChart');
+        const catLabels = [];
+        const catData = [];
 
-          new Chart(ctx, {
-            type: 'pie',
+        {% for s in stats_category %}
+        catData.push({{ s.count }})
+        catLabels.push('{{ s.name }}')
+        {% endfor %}
+
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'bar',
             data: {
-              labels: labels,
-              datasets: [{
-                label: '# Đếm số khóa học theo danh mục',
-                data: data,
-                borderWidth: 1,
-                backgroundColor: ['red', 'green', 'blue', 'gold', 'brown']
-              }]
+                labels: catLabels,
+                datasets: [{
+                    label: '# Số lượng bài đăng',
+                    data: catData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
             },
-            options: {
-              scales: {
-                y: {
-                  beginAtZero: true
-                }
-              }
-            }
-          });
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+
+        const appLabels = [];
+        const appData = [];
+
+        {% for s in stats_application %}
+        appData.push({{ s.count }})
+        appLabels.push('{{ s.name }}')
+        {% endfor %}
+
+        new Chart(document.getElementById('applicationChart'), {
+            type: 'bar',
+            data: {
+                labels: appLabels,
+                datasets: [{
+                    label: '# Số lượng ứng viên',
+                    data: appData,
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
     }
 </script>
 
