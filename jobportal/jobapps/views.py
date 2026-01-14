@@ -23,10 +23,9 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
     queryset = JobPost.objects.filter(active=True)
     serializer_class = serializers.JobPostSerializer
     pagination_class = paginators.ItemPaginator
-    # Thêm parser để hỗ trợ upload CV từ các action post trong này
     parser_classes = [parsers.MultiPartParser, parsers.JSONParser]
 
-    # Done ổn
+
     @action(methods=['post'], detail=False, permission_classes=[IsApprovedEmployer])
     def add_job(self, request):
         data = request.data.copy()
@@ -41,7 +40,7 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    #Done ổn
+
     @action(methods=['patch'], detail=True, permission_classes=[IsApprovedEmployer])
     def update_job(self, request, pk=None):
 
@@ -58,7 +57,7 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
         job.save()
         return Response(serializers.JobPostSerializer(job).data, status=status.HTTP_200_OK)
 
-    #done ổn
+
     @action(methods=['delete'], detail=True, permission_classes=[IsApprovedEmployer])
     def delete_job(self, request, pk=None):
 
@@ -94,6 +93,17 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
         if address:
             query = query.filter(address__icontains=address)
 
+        sort_by = self.request.query_params.get('sort_by')
+        if sort_by == 'salary_asc':
+            query = query.order_by('salary')
+        elif sort_by == 'salary_desc':
+            query = query.order_by('-salary')
+        elif sort_by == 'date_asc':
+            query = query.order_by('created_date')
+        else:
+            query = query.order_by('-created_date')
+
+
         return query
 
 
@@ -102,9 +112,9 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
         if request.user.role != 'candidate':
             return Response( status=status.HTTP_403_FORBIDDEN)
 
-        # Tránh lỗi 500 do unique_together (job_post, candidate)
         if Applications.objects.filter(job_post_id=pk, candidate=request.user).exists():
-            return Response( status=status.HTTP_400_BAD_REQUEST)
+            return Response( {"detail": "Bạn đã ứng tuyển công việc này rồi."},
+                        status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data.copy()
         data['candidate'] = request.user.pk
@@ -112,7 +122,7 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
 
         s = serializers.ApplicationSerializer(data=data)
         s.is_valid(raise_exception=True)
-        app = s.save()
+        app = s.save(candidate=request.user, job_post_id=pk)
 
         return Response(serializers.ApplicationSerializer(app).data, status=status.HTTP_201_CREATED)
 
@@ -127,7 +137,6 @@ class JobPostView(viewsets.ViewSet, generics.ListAPIView):
         return Response(serializers.ApplicationSerializer(applications, many=True).data, status=status.HTTP_200_OK)
 
 
-#Done ổn
 class ApplicationView(viewsets.ViewSet, generics.ListAPIView):
     queryset = Applications.objects.filter(active=True)
     serializer_class = serializers.ApplicationSerializer
@@ -135,15 +144,11 @@ class ApplicationView(viewsets.ViewSet, generics.ListAPIView):
     parser_classes = [parsers.MultiPartParser, parsers.JSONParser]
 
     def get_queryset(self):
-        query = self.queryset
+        query = self.queryset.select_related('job_post', 'job_post__employer')
         user = self.request.user
 
         if user.role == 'candidate':
-            query = query.filter(candidate=user)
-
-        elif user.role == 'employer':
-            query = query.filter(job_post__employer=user)
-
+            query = query.filter(candidate=user).order_by('-created_date')
         return query
 
     def get_permissions(self):
@@ -164,22 +169,20 @@ class ApplicationView(viewsets.ViewSet, generics.ListAPIView):
                             status=status.HTTP_403_FORBIDDEN)
 
         if request.method.__eq__('POST'):
-            # Gửi dữ liệu vào Serializer
             s = serializers.CommentSerializer(data={
                 'content': request.data.get('content'),
-                'user': self.request.user.pk,  # Lấy user từ token
+                'user': self.request.user.pk,
                 'application': pk
             })
 
             if s.is_valid():
-                c = s.save()
+                c = s.save(user=request.user, application_id=pk)
                 return Response(serializers.CommentSerializer(c).data, status=status.HTTP_201_CREATED)
 
             return Response(s.errors, status=status.HTTP_400_BAD_REQUEST)
 
         comments = application.comment_set.select_related('user').filter(active=True).filter(active=True)
 
-        # Phân trang
         p = paginators.CommentPaginator()
         page = p.paginate_queryset(comments, request)
         if page is not None:
@@ -188,7 +191,6 @@ class ApplicationView(viewsets.ViewSet, generics.ListAPIView):
 
         return Response(serializers.CommentSerializer(comments, many=True).data, status=status.HTTP_200_OK)
 
-#Done ổn
 class UserView(viewsets.ViewSet, generics.CreateAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = serializers.UserSerializer
@@ -214,9 +216,7 @@ class StatsView(viewsets.ViewSet):
         if request.user.role != 'employer':
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        # Thống kê số lượng hồ sơ theo từng Job của Employer này
-        stats = JobPost.objects.filter(employer=request.user).annotate(
-            total_applications=Count('applications')
+        stats = JobPost.objects.filter(employer=request.user).annotate(total_applications=Count('applications')
         ).values('id', 'name', 'total_applications')
 
         return Response(stats)

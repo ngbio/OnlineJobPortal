@@ -69,12 +69,3 @@ class Comment(Interaction):
     def __str__(self):
         return self.content
 
-class Payment(BaseModel):
-    pass
-    # name = models.TextField(null=True)
-    # amount = models.IntegerField(null=True)
-    # price = models.IntegerField(null=True)
-    # User = models.ForeignKey(User, on_delete=models.CASCADE)
-    #
-    # def __str__(self):
-    #     return self.name
