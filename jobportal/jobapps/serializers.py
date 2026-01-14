@@ -11,14 +11,16 @@ class CategorySerializer(serializers.ModelSerializer):
 class JobPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobPost
-        fields = ['id', 'name', 'company', 'description', 'request', 'salary', 'address', 'benefits', 'category', 'employer']
+        fields = ['id', 'created_date', 'name', 'company', 'description', 'request', 'salary', 'address', 'benefits', 'category', 'employer']
 
 class ApplicationSerializer(serializers.ModelSerializer):
+    job_post = JobPostSerializer(read_only=True)
+
     class Meta:
         model = Applications
         fields = [
             'id', 'full_name', 'email', 'phone',
-            'created_date', 'cv', 'candidate', 'job_post'
+            'created_date', 'cv', 'candidate', 'job_post', 'job_post'
         ]
         extra_kwargs = {
             'candidate': {'write_only': True},
@@ -45,7 +47,7 @@ class UserSerializer(serializers.ModelSerializer):
         if u.role == 'candidate':
             u.is_active = True
         if u.role == 'employer':
-            u.is_active = False # chờ duyệt
+            u.is_active = False
 
 
         u.save()
