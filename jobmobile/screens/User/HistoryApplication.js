@@ -8,19 +8,18 @@ import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { View } from "react-native";
 
-const Application = ({route}) => {
+const HistoryApplication = ({route}) => {
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(false);
     const [user] = useContext(MyContext);    
     const nav = useNavigation();
-    const jobId = route.params?.jobId;
 
     const loadApplications = async () => {
         try {
             console.log("Context User:", user);
             setLoading(true);
 
-            const res = await authApis(user.access_token).get(endpoints['applicationsid'](jobId));
+            const res = await authApis(user.access_token).get(endpoints['applications']);
             setApplications( res.data);
 
         } catch (ex) {
@@ -42,14 +41,14 @@ const Application = ({route}) => {
 
     return (
         <View>
+            {user.role == "candidate" && (
                 <FlatList
                             data={applications}
                             keyExtractor={(item) => item.id.toString()}
                             renderItem={({ item }) => (<List.Item
-                                        title={item.full_name}
+                                        title={item.job_post?.name}
                                         description={`Ngày ứng tuyển: ${new Date(item.created_date).toLocaleDateString()}`}
-                                        left={() => 
-                                        <TouchableOpacity onPress={() => nav.navigate("Comment", { "applicationId": item.id })}>
+                                        left={() => <TouchableOpacity onPress={() => nav.navigate("Comment", { "applicationId": item.id })}>
                                             <View style={MyStyles.circleIcon}>
                                                 <List.Icon icon="account" color="white" size={100} />
                                             </View>
@@ -57,8 +56,10 @@ const Application = ({route}) => {
                                     />
                             )}
                         />
+            )}
+
         </View>
     );
 };
 
-export default Application;
+export default HistoryApplication;

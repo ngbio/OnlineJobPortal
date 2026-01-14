@@ -7,11 +7,17 @@ import { useNavigation } from "@react-navigation/native";
 import { MyContext } from "../../utils/contexts/MyContext";
 
 const AddJob = () => {
-    // Cấu trúc mảng info tương tự màn Apply
     const info = [
-        { title: "Tên công việc", field: "name", icon: "briefcase" },
-        { title: "Tên công ty", field: "company", icon: "office-building" },
-        { title: "Mức lương", field: "salary", icon: "cash", keyboard: "numeric" },
+        { title: "Tên công việc", 
+            field: "name", 
+            icon: "briefcase" },
+        { title: "Tên công ty", 
+            field: "company", 
+            icon: "office-building" },
+        { title: "Mức lương", 
+            field: "salary", 
+            icon: "cash", 
+            keyboard: "numeric" },
         { title: "Địa chỉ", field: "address", icon: "map-marker" },
         { title: "Mô tả công việc", field: "description", icon: "text-long", multiline: true },
         { title: "Yêu cầu", field: "request", icon: "clipboard-list", multiline: true },
@@ -25,7 +31,6 @@ const AddJob = () => {
     const [user] = useContext(MyContext);
     const nav = useNavigation();
 
-    // Load danh mục khi mở màn hình
     useEffect(() => {
         const loadCategories = async () => {
             try {
@@ -39,7 +44,6 @@ const AddJob = () => {
     }, []);
 
     const validate = () => {
-        // Kiểm tra các trường bắt buộc (Tên, Công ty, Ngành nghề)
         if (!jobData.name || !jobData.company || !jobData.category_id) {
             setErr(true);
             return false;
@@ -52,12 +56,8 @@ const AddJob = () => {
         if (validate()) {
             try {
                 setLoading(true);
-                // Vì không có ảnh nên ta gửi JSON bình thường, 
-                // không cần dùng FormData trừ khi backend yêu cầu bắt buộc
-                const res = await authApis(user.access_token).post(
-                    `${endpoints['job_posts']}add_job/`, 
-                    jobData
-                );
+
+                const res = await authApis(user.access_token).post(`${endpoints['job_posts']}add_job/`, jobData);
 
                 if (res.status === 201 || res.status === 200) {
                     alert("Đăng tin thành công!");
@@ -78,7 +78,7 @@ const AddJob = () => {
             
             <ScrollView showsVerticalScrollIndicator={false}>
                 <HelperText type="error" visible={err}>
-                    Vui lòng nhập đầy đủ Tên, Công ty và chọn Ngành nghề!
+                    Vui lòng nhập đầy đủ!
                 </HelperText>
 
                 {info.map(i => (

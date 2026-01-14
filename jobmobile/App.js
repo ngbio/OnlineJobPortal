@@ -12,10 +12,11 @@ import MyUserReducer from "./utils/reducers/MyUserReducer";
 import User from "./screens/User/User";
 import Apply from "./screens/Home/Apply";
 import JobDetail from "./screens/Home/JobDetail";
-import ApplicationDetail from "./screens/Home/ApplicationDetail";
 import AddJob from "./screens/User/AddJob";
 import UpdateJob from "./screens/Home/UpdateJob";
 import Stats from "./screens/User/Stats";
+import HistoryApplication from "./screens/User/HistoryApplication";
+import Comment from "./screens/Home/Comment";
 
 const Stack = createNativeStackNavigator();
 
@@ -27,9 +28,9 @@ const StackNavigator = () => {
       <Stack.Screen name="Application" component={Application} options={{ title: "Danh sách đơn ứng tuyển" }} />
       <Stack.Screen name="JobDetail" component={JobDetail} options={{ title: "Chi tiết tuyển dụng" ,tabBarHideOnKeyboard:false}} />
       <Stack.Screen name="Apply" component={Apply} options={{ title: "Ứng tuyển" }} />
-      <Stack.Screen name="ApplicationDetail" component={ApplicationDetail} options={{ title: "Chi tiết đơn ứng tuyển" }} />
+      <Stack.Screen name="Comment" component={Comment} options={{ title: "Chi tiết đơn ứng tuyển" }} />
       <Stack.Screen name="UpdateJob" component={UpdateJob} options={{ title: "Cập nhật đơn tuyển dụng" }} />
-
+      <Stack.Screen name="HistoryApplication" component={HistoryApplication}  options={{ title: "Lịch sử ứng tuyển" }} />
     </Stack.Navigator>
   );
 }
@@ -52,7 +53,7 @@ const TabNavigator = () => {
         <Tab.Screen name="Stats" component={Stats} options={{ title: "Thống kê", tabBarIcon: () => <Icon color="blue" source="chart-bar" size={30} /> }} />
       </>)}
       {user?.role === "candidate" && (<>
-        <Tab.Screen name="Applications" component={Application} options={{ title: "Ứng tuyển", tabBarIcon: () => <Icon color="blue" source="file-document" size={30} /> }} />
+        <Tab.Screen name="HistoryApplications" component={StackNavigator} initialParams={{ screen: 'HistoryApplication' }} options={{ title: "Lịch sử ứng tuyển",headerShown: false , tabBarIcon: () => <Icon color="blue" source="file-document" size={30} /> }} />
       </>)}
 
     </Tab.Navigator>

@@ -24,14 +24,12 @@ const UpdateJob = () => {
 
     const [jobData, setJobData] = useState({});
     const [categories, setCategories] = useState([]);
-    const [err, setErr] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [fetching, setFetching] = useState(true); // Trạng thái đang tải dữ liệu cũ
+    const [fetching, setFetching] = useState(true); 
 
     useEffect(() => {
         const loadInitialData = async () => {
             try {
-                // 1. Load danh mục
                 const resCate = await Apis.get(endpoints['categories']);
                 setCategories(resCate.data);
 
@@ -44,20 +42,10 @@ const UpdateJob = () => {
         loadInitialData();
     }, [jobId]);
 
-    const validate = () => {
-        if (!jobData.name || !jobData.company || !jobData.category_id) {
-            setErr(true);
-            return false;
-        }
-        setErr(false);
-        return true;
-    };
 
     const handleUpdate = async () => {
-        if (validate()) {
             try {
                 setLoading(true);
-                // Sử dụng PATCH để cập nhật một phần dữ liệu
                 const res = await authApis(user.access_token).patch(
                     `${endpoints['update_job'](jobId)}`, 
                     jobData
@@ -73,7 +61,7 @@ const UpdateJob = () => {
             } finally {
                 setLoading(false);
             }
-        }
+        
     };
 
     if (fetching) 
@@ -84,13 +72,10 @@ const UpdateJob = () => {
             <Text style={[MyStyles.title, { textAlign: 'center', marginBottom: 10 }]}>Chỉnh sửa tin</Text>
             
             <ScrollView showsVerticalScrollIndicator={false}>
-                <HelperText type="error" visible={err}>
-                    Các trường (*) không được để trống!
-                </HelperText>
 
                 {info.map(i => (
                     <TextInput key={i.field} style={MyStyles.margin} 
-                        value={String(jobData[i.field] || "")} // Ép kiểu string để TextInput không lỗi
+                        value={String(jobData[i.field] || "")}
                         onChangeText={(text) => setJobData({ ...jobData, [i.field]: text })}
                         label={i.title}
                         mode="outlined"

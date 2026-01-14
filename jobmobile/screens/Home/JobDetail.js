@@ -14,7 +14,7 @@ const JobDetail = () => {
 
     useEffect(() => {
         if (user === null) {
-            nav.navigate("HomeScreen"); // Hoặc nav.popToTop();
+            nav.navigate("HomeScreen"); 
         }
     }, [user]);
 
@@ -65,7 +65,6 @@ const handleDelete = () => {
             <Text style={styles.label}>Quyền lợi</Text>
             <Text>{job?.benefits}</Text>
 
-            {/* Candidate */}
             {user.role === "candidate" && (
                 <Button
                     mode="contained"
@@ -75,8 +74,6 @@ const handleDelete = () => {
                     Ứng tuyển
                 </Button>
             )}
-
-            {/* Employer */}
             {user.role === "employer" && (
                 <Button
                     mode="outlined"

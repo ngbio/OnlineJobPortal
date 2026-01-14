@@ -28,45 +28,9 @@ const Apply = () => {
     const { jobId } = route.params || {};
     const [loading, setLoading] = useState(false);
     const [user] = useContext(MyContext);
-    const [isApplied, setIsApplied] = useState(false); // State kiểm tra trạng thái
-    const [checking, setChecking] = useState(true);
-
-    // Hàm kiểm tra trạng thái ứng tuyển
-    const checkAppliedStatus = async () => {
-        try {
-            // Giả sử backend có endpoint: /job-posts/{jobId}/applied-status/
-            // Hoặc bạn lọc trong danh sách đơn ứng tuyển của user
-            let res = await authApis(user.access_token).get(endpoints['apply_job'](jobId));
-            
-            if (res.data.is_applied === true) {
-                setIsApplied(true);
-                alert("Bạn đã ứng tuyển công việc này rồi!");
-            }
-        } catch (ex) {
-            console.error("Lỗi kiểm tra trạng thái:", ex);
-        } finally {
-            setChecking(false);
-        }
-    }
-
-    useEffect(() => {
-        if (jobId && user) {
-            checkAppliedStatus();
-        }
-    }, [jobId]);
 
 
-    // Nếu đã ứng tuyển, hiển thị thông báo thay vì form
-    if (isApplied) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-                <Text style={{ fontSize: 18, textAlign: 'center', marginBottom: 20 }}>
-                    Bạn đã gửi hồ sơ cho công việc này. Vui lòng chờ phản hồi từ nhà tuyển dụng!
-                </Text>
-                <Button mode="contained" onPress={() => nav.goBack()}>Quay lại</Button>
-            </View>
-        );
-    }
+
 
     const pickCV = async () => {
         let { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();

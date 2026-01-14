@@ -1,14 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, StyleSheet, Animated } from 'react-native';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { View, Text, ScrollView, ActivityIndicator, StyleSheet, Animated, RefreshControl} from 'react-native';
 import { List, Card, ProgressBar, Surface, Divider } from 'react-native-paper';
 import { MyContext } from '../../utils/contexts/MyContext';
 import { authApis, endpoints } from '../../utils/Apis';
 import MyStyles from '../../styles/MyStyles';
 
+
 const Stats = () => {
     const [user] = useContext(MyContext);
     const [stats, setStats] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
     const loadStats = async () => {
         try {
@@ -21,8 +23,14 @@ const Stats = () => {
         }
     };
 
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await loadStats(); 
+        setRefreshing(false);
+    };
+
     useEffect(() => {
-        loadStats();
+            loadStats();
     }, []);
 
     if (loading)   
@@ -31,7 +39,9 @@ const Stats = () => {
     const maxApplications = stats.length > 0 ? Math.max(...stats.map(s => s.total_applications)) : 1;
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView style={styles.container} refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }>
             <Surface style={styles.header} elevation={2}>
                 <Text style={styles.headerText}>THỐNG KÊ TUYỂN DỤNG</Text>
             </Surface>

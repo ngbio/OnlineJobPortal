@@ -30,13 +30,6 @@ const Login = () => {
 
 
     const validate = () => {
-        // if (!user.password || user.password !== user.confirm) {
-        //     setErr(true);
-        //     return false;
-        // }
-
-
-        // setErr(false);
         return true;
     }
 
@@ -48,13 +41,11 @@ const Login = () => {
                 const form = new URLSearchParams();
                 form.append("username", user.username);
                 form.append("password", user.password);
-                form.append("client_id", "AgQYJFPVEFw6Hs0V3VeWiRA3HjUOA7NAfZMSzqCM");
-                form.append("client_secret", "dep9jQXkOMIMjTHiHffPvURKap9mLWuYye84twIRZAGhn7HrSNWsYxq4ZKUWra8ks2LKII9El726kEeR75EOhZPWpxYtDmMeeUAUyO9USFoZxr21metfeW34GpywGLFp");
+                form.append("client_id", "UY29nbKGK0RYOoXXzkugo75XADhdeFc92P1cqyr1");
+                form.append("client_secret", "LNDoJCPw3WBdohgniA13XjtwvzVQGomuw0jUerIwZxjxBr5IRWc50l9ZryCINmuDddFVPUPATUXV2xORutOmRYq1iuiEc3fDl1wZ7qPxPy8WJPV0TbadZpRPS9RO59x1");
                 form.append("grant_type", "password");
 
-                let res = await Apis.post(
-                    endpoints["login"],
-                    form,
+                let res = await Apis.post(endpoints["login"], form,
                     {
                         headers: {
                             "Content-Type": "application/x-www-form-urlencoded"
