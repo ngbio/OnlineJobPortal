@@ -1,11 +1,12 @@
 import axios from "axios";
 
-const BASE_URL = 'https://ngbio.pythonanywhere.com/';
+const BASE_URL = 'http://192.168.7.41:8000/';
 
 export const endpoints = {
     'categories': '/categories/',
     'job_posts': '/job_post/',
     'applications': "/applications/",
+    'applicationsid':(jobId) => `/job_post/${jobId}/applications/`,
     'register': '/users/',
     'login': '/o/token/',
     'current_user': '/users/current-user/',

@@ -17,8 +17,8 @@ export default StyleSheet.create ({
   circleIcon: {
     width: 80,
     height: 80,
-    borderRadius: 100,   // tròn
-    backgroundColor: '#03afffff', // xanh đẹp
+    borderRadius: 100,   
+    backgroundColor: '#03afffff', 
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 5
@@ -31,5 +31,15 @@ export default StyleSheet.create ({
         fontWeight: "bold",
         color: "blue",
         alignSelf: "center"
+  },chip: {
+    backgroundColor: '#f0f0f0', 
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 15,
+    alignSelf: 'flex-start',
+  },
+  chipText: {
+    fontSize: 13,
+    color: '#444',
   }
 });
